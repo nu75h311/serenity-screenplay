@@ -5,13 +5,16 @@ import static net.serenitybdd.screenplay.GivenWhenThen.seeThat;
 import static net.serenitybdd.screenplay.GivenWhenThen.then;
 import static net.serenitybdd.screenplay.GivenWhenThen.when;
 import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.Matchers.contains;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import net.nu75h311.demos.questions.TheTodoItems;
@@ -27,7 +30,7 @@ public class AddItemsStory {
 
     Actor zeh = Actor.named("Zé");
 
-    @Managed(uniqueSession = true)
+    @Managed
     public WebDriver hisBrowser;
 
     @BeforeClass
@@ -37,8 +40,17 @@ public class AddItemsStory {
 
     @Before
     public void zehCanBrowseTheWeb() {
-        hisBrowser = new ChromeDriver();
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless");
+        hisBrowser = new ChromeDriver(options);
         zeh.can(BrowseTheWeb.with(hisBrowser));
+    }
+
+    @After
+    public void teardown() {
+        if (hisBrowser != null) {
+            hisBrowser.quit();
+        }
     }
 
     @Test
@@ -49,5 +61,18 @@ public class AddItemsStory {
         when(zeh).attemptsTo(AddATodoItem.called("Feed the cat"));
 
         then(zeh).should(seeThat(TheTodoItems.displayed(), hasItem("Feed the cat")));
+    }
+
+    @Test
+    public void should_be_able_to_add_additional_todo_items() {
+
+        givenThat(zeh).wasAbleTo(
+                StartWith.aTodoListContaining("Feed the cat","Take out the garbage")
+        );
+
+        when(zeh).attemptsTo(AddATodoItem.called("Walk the dog"));
+
+        then(zeh).should(seeThat(TheTodoItems.displayed(),
+                contains("Feed the cat","Take out the garbage","Walk the dog")));
     }
 }

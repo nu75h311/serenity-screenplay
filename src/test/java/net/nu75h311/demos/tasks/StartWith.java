@@ -2,24 +2,18 @@ package net.nu75h311.demos.tasks;
 
 import static net.serenitybdd.screenplay.Tasks.instrumented;
 
-import net.nu75h311.demos.ui.TodoMvcApplicationHomePage;
-import net.serenitybdd.screenplay.Actor;
-import net.serenitybdd.screenplay.Task;
-import net.serenitybdd.screenplay.actions.Open;
-import net.thucydides.core.annotations.Step;
+import com.google.common.collect.Lists;
 
-public class StartWith implements Task {
+import net.serenitybdd.core.steps.Instrumented;
 
-    TodoMvcApplicationHomePage todoMvcApplicationHomePage;
+public class StartWith {
 
-    public static StartWith anEmptyTodoList() {
-        return instrumented(StartWith.class);
+    public static StartWithAnEmptyList anEmptyTodoList() {
+        return instrumented(StartWithAnEmptyList.class);
     }
 
-    @Override
-    @Step("{0} starts with an empty todo list")
-    public <T extends Actor> void performAs(final T actor) {
-        actor.attemptsTo(
-                Open.browserOn().the(todoMvcApplicationHomePage));
+    public static StartWithATodoListContaining aTodoListContaining(String... todos) {
+        return Instrumented.instanceOf(StartWithATodoListContaining.class)
+                .withProperties(Lists.newArrayList(todos));
     }
 }
